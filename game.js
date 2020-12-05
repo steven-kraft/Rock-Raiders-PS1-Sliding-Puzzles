@@ -148,7 +148,11 @@ window.onload = function() {
         width: 640,
         height: 480,
         backgroundColor: 0x000000,
+        parent: 'parent',
         scene: [mainScene],
+        scale: {
+            autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
+        }
     }
 
     var game = new Phaser.Game(config);
