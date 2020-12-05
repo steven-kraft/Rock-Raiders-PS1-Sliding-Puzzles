@@ -6,6 +6,9 @@ const POSITIONS = [
     [{x:0, y:244}, {x:122, y:244}, {x:244, y:244}],
 ]
 const EMPTY = [0,0,8,8,0,2,0,2,0] //Location of the initial empty square in each puzzle
+const urlParams = new URLSearchParams(window.location.search);
+const kermit = urlParams.get('kermit');
+
 
 class mainScene extends Phaser.Scene {
     constructor() {
@@ -20,6 +23,7 @@ class mainScene extends Phaser.Scene {
         for (let i = 1; i < 10; i++) {
             this.load.spritesheet(`puzzle${i}`, `assets/puzzle${i}.png`, { frameWidth: 122, frameHeight: 122 });
         }
+        this.load.spritesheet('kermit', `assets/kermit.png`, { frameWidth: 122, frameHeight: 122 });
         this.load.audio('slide', 'assets/slide.wav')
     }
 
@@ -34,6 +38,11 @@ class mainScene extends Phaser.Scene {
         var puzzle_id = Math.floor(Math.random() * 9);
         var puzzle = `puzzle${puzzle_id + 1}`
         this.cur_pos = {x:(Math.floor(EMPTY[puzzle_id]/3)), y:(EMPTY[puzzle_id]%3)}
+
+        if(kermit) {
+            puzzle = 'kermit'
+            this.cur_pos = {x:0, y:0}
+        }
 
         this.add.image(320, 240, 'background');
         
