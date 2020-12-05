@@ -14,7 +14,10 @@ class mainScene extends Phaser.Scene {
 
     preload() {
         this.load.image('background', 'assets/background.png');
-        this.load.spritesheet('puzzle1', 'assets/puzzle1.png', { frameWidth: 122, frameHeight: 122 });
+        for (let i = 1; i < 10; i++) {
+            this.load.spritesheet(`puzzle${i}`, `assets/puzzle${i}.png`, { frameWidth: 122, frameHeight: 122 });
+        }
+        
     }
 
     create() {
@@ -22,9 +25,9 @@ class mainScene extends Phaser.Scene {
         this.right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         this.up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         this.down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        var puzzle_id = 0;
+        var puzzle_id = Math.floor(Math.random() * 8);
         var puzzle = `puzzle${puzzle_id + 1}`
-        this.cur_pos = {x:(EMPTY[puzzle_id]/3), y:(EMPTY[puzzle_id]%3)}
+        this.cur_pos = {x:(Math.floor(EMPTY[puzzle_id]/3)), y:(EMPTY[puzzle_id]%3)}
 
         this.add.image(320, 240, 'background');
         this.pieces = []
