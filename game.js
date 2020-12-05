@@ -21,7 +21,6 @@ class mainScene extends Phaser.Scene {
             this.load.spritesheet(`puzzle${i}`, `assets/puzzle${i}.png`, { frameWidth: 122, frameHeight: 122 });
         }
         this.load.audio('slide', 'assets/slide.wav')
-        
     }
 
     create() {
