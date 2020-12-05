@@ -46,69 +46,46 @@ class mainScene extends Phaser.Scene {
     }
 
     staging() {
-        let moving = false;
-        var new_pos;
-        var choice;
-        while (moving == false) {
-            choice = Math.floor(Math.random() * 4);
-            if (choice == 0 && this.cur_pos.y != 2) {
-                new_pos = {x: this.cur_pos.x, y: this.cur_pos.y + 1}
-                moving = true;
-            } else if (choice == 1 && this.cur_pos.y != 0) {
-                new_pos = {x: this.cur_pos.x, y: this.cur_pos.y - 1}
-                moving = true;
-            } else if (choice == 2 && this.cur_pos.x != 2) {
-                new_pos = {x: this.cur_pos.x + 1, y: this.cur_pos.y}
-                moving = true;
-            } else if (choice == 3 && this.cur_pos.x != 0) {
-                new_pos = {x: this.cur_pos.x - 1, y: this.cur_pos.y}
-                moving = true;
-            } 
+        if (this.staging_step % 2 == 0) {
+            let moving = false;
+            var choice;
+            while (moving == false) {
+                choice = Math.floor(Math.random() * 4);
+                if (choice == 0) {
+                    moving = this.move_piece("left", false);
+                } else if (choice == 1) {
+                    moving = this.move_piece("right", false);
+                } else if (choice == 2) {
+                    moving = this.move_piece("up", false);
+                } else if (choice == 3) {
+                    moving = this.move_piece("down", false);
+                } 
+            }
         }
-
-        var blank_piece = this.pieces[this.cur_pos.x][this.cur_pos.y];
-        var new_piece = this.pieces[new_pos.x][new_pos.y];
-        new_piece.x = PUZZLE_X + POSITIONS[this.cur_pos.x][this.cur_pos.y].x;
-        new_piece.y = PUZZLE_Y + POSITIONS[this.cur_pos.x][this.cur_pos.y].y;
-        blank_piece.x = PUZZLE_X + POSITIONS[new_pos.x][new_pos.y].x;
-        blank_piece.y = PUZZLE_Y + POSITIONS[new_pos.x][new_pos.y].y;
-        this.pieces[this.cur_pos.x][this.cur_pos.y] = new_piece;
-        this.pieces[new_pos.x][new_pos.y] = blank_piece;
-        this.cur_pos.x = new_pos.x;
-        this.cur_pos.y = new_pos.y;
+        this.staging_step += 1;
+        if (this.staging_step >= 200) {
+            this.sound.play('slide');
+        }
+        
     }
 
-    update() {
-        if (Phaser.Input.Keyboard.JustDown(this.space)) {
-            this.scene.restart();
-        }
-        if (this.staging_step < 200) {
-            if (this.staging_step % 2 == 0) {
-                this.staging();
-            }
-            this.staging_step += 1;
-            if (this.staging_step >= 200) {
-                this.sound.play('slide');
-            }
-            return;
-        }
+    move_piece(direction, sound=true) {
         var moving = false;
-        var new_pos;
-        if (Phaser.Input.Keyboard.JustDown(this.left) && this.cur_pos.y != 2) {
+        if (direction == "left" && this.cur_pos.y != 2) {
             new_pos = {x: this.cur_pos.x, y: this.cur_pos.y + 1}
             moving = true;
-        } else if (Phaser.Input.Keyboard.JustDown(this.right) && this.cur_pos.y != 0) {
+        } else if (direction == "right" && this.cur_pos.y != 0) {
             new_pos = {x: this.cur_pos.x, y: this.cur_pos.y - 1}
             moving = true;
-        } else if (Phaser.Input.Keyboard.JustDown(this.up) && this.cur_pos.x != 2) {
+        } else if (direction == "up" && this.cur_pos.x != 2) {
             new_pos = {x: this.cur_pos.x + 1, y: this.cur_pos.y}
             moving = true;
-        } else if (Phaser.Input.Keyboard.JustDown(this.down) && this.cur_pos.x != 0) {
+        } else if (direction == "down" && this.cur_pos.x != 0) {
             new_pos = {x: this.cur_pos.x - 1, y: this.cur_pos.y}
             moving = true;
         }
-
         if(moving) {
+            var new_pos;
             var blank_piece = this.pieces[this.cur_pos.x][this.cur_pos.y];
             var new_piece = this.pieces[new_pos.x][new_pos.y];
             new_piece.x = PUZZLE_X + POSITIONS[this.cur_pos.x][this.cur_pos.y].x;
@@ -119,7 +96,39 @@ class mainScene extends Phaser.Scene {
             this.pieces[new_pos.x][new_pos.y] = blank_piece;
             this.cur_pos.x = new_pos.x;
             this.cur_pos.y = new_pos.y;
-            this.sound.play('slide');
+            if(sound) {this.sound.play('slide');}
+        }
+        this.is_complete();
+        return moving;
+    }
+
+    is_complete() {
+        let order = []
+        for (var row in this.pieces) {
+            for (var p in this.pieces[row]) {
+                order.push(this.pieces[row][p].frame.name)
+            }
+        }
+        return !!order.reduce((n, item) => n !== false && item >= n && item);
+    }
+
+    update() {
+        if (Phaser.Input.Keyboard.JustDown(this.space)) {
+            this.scene.restart();
+        }
+        if (this.staging_step < 150) {
+            this.staging();
+            return;
+        }
+        
+        if (Phaser.Input.Keyboard.JustDown(this.left)) {
+            this.move_piece("left");
+        } else if (Phaser.Input.Keyboard.JustDown(this.right)) {
+            this.move_piece("right");
+        } else if (Phaser.Input.Keyboard.JustDown(this.up)) {
+            this.move_piece("up");
+        } else if (Phaser.Input.Keyboard.JustDown(this.down)) {
+            this.move_piece("down");;
         }
     }
 }
