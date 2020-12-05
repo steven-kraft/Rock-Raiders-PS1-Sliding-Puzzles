@@ -25,7 +25,10 @@ class mainScene extends Phaser.Scene {
         this.right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         this.up = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         this.down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        var puzzle_id = Math.floor(Math.random() * 8);
+        this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.staging_step = 0;
+
+        var puzzle_id = Math.floor(Math.random() * 9);
         var puzzle = `puzzle${puzzle_id + 1}`
         this.cur_pos = {x:(Math.floor(EMPTY[puzzle_id]/3)), y:(EMPTY[puzzle_id]%3)}
 
@@ -41,7 +44,50 @@ class mainScene extends Phaser.Scene {
         }
     }
 
+    staging() {
+        let moving = false;
+        var new_pos;
+        var choice;
+        while (moving == false) {
+            choice = Math.floor(Math.random() * 4);
+            if (choice == 0 && this.cur_pos.y != 2) {
+                new_pos = {x: this.cur_pos.x, y: this.cur_pos.y + 1}
+                moving = true;
+            } else if (choice == 1 && this.cur_pos.y != 0) {
+                new_pos = {x: this.cur_pos.x, y: this.cur_pos.y - 1}
+                moving = true;
+            } else if (choice == 2 && this.cur_pos.x != 2) {
+                new_pos = {x: this.cur_pos.x + 1, y: this.cur_pos.y}
+                moving = true;
+            } else if (choice == 3 && this.cur_pos.x != 0) {
+                new_pos = {x: this.cur_pos.x - 1, y: this.cur_pos.y}
+                moving = true;
+            } 
+        }
+
+        var blank_piece = this.pieces[this.cur_pos.x][this.cur_pos.y];
+        var new_piece = this.pieces[new_pos.x][new_pos.y];
+        new_piece.x = PUZZLE_X + POSITIONS[this.cur_pos.x][this.cur_pos.y].x;
+        new_piece.y = PUZZLE_Y + POSITIONS[this.cur_pos.x][this.cur_pos.y].y;
+        blank_piece.x = PUZZLE_X + POSITIONS[new_pos.x][new_pos.y].x;
+        blank_piece.y = PUZZLE_Y + POSITIONS[new_pos.x][new_pos.y].y;
+        this.pieces[this.cur_pos.x][this.cur_pos.y] = new_piece;
+        this.pieces[new_pos.x][new_pos.y] = blank_piece;
+        this.cur_pos.x = new_pos.x;
+        this.cur_pos.y = new_pos.y;
+    }
+
     update() {
+        if (Phaser.Input.Keyboard.JustDown(this.space)) {
+            this.scene.restart();
+        }
+        if (this.staging_step < 270) {
+            if (this.staging_step % 3 == 0) {
+                this.staging();
+            }
+            this.staging_step += 1;
+            return;
+        }
         var moving = false;
         var new_pos;
         if (Phaser.Input.Keyboard.JustDown(this.left) && this.cur_pos.y != 2) {
@@ -56,7 +102,7 @@ class mainScene extends Phaser.Scene {
         } else if (Phaser.Input.Keyboard.JustDown(this.down) && this.cur_pos.x != 0) {
             new_pos = {x: this.cur_pos.x - 1, y: this.cur_pos.y}
             moving = true;
-        } 
+        }
 
         if(moving) {
             var blank_piece = this.pieces[this.cur_pos.x][this.cur_pos.y];
