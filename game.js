@@ -17,6 +17,7 @@ class mainScene extends Phaser.Scene {
         for (let i = 1; i < 10; i++) {
             this.load.spritesheet(`puzzle${i}`, `assets/puzzle${i}.png`, { frameWidth: 122, frameHeight: 122 });
         }
+        this.load.audio('slide', 'assets/slide.wav')
         
     }
 
@@ -81,11 +82,14 @@ class mainScene extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.space)) {
             this.scene.restart();
         }
-        if (this.staging_step < 270) {
-            if (this.staging_step % 3 == 0) {
+        if (this.staging_step < 200) {
+            if (this.staging_step % 2 == 0) {
                 this.staging();
             }
             this.staging_step += 1;
+            if (this.staging_step >= 200) {
+                this.sound.play('slide');
+            }
             return;
         }
         var moving = false;
@@ -115,6 +119,7 @@ class mainScene extends Phaser.Scene {
             this.pieces[new_pos.x][new_pos.y] = blank_piece;
             this.cur_pos.x = new_pos.x;
             this.cur_pos.y = new_pos.y;
+            this.sound.play('slide');
         }
     }
 }
