@@ -71,6 +71,7 @@ class mainScene extends Phaser.Scene {
         if (this.staging_step >= 150) {
             this.sound.play('slide');
             this.message.setTexture('message');
+            this.complete = false;
         }
         
     }
@@ -106,6 +107,7 @@ class mainScene extends Phaser.Scene {
         }
         if(this.is_complete()) {
             this.message.setTexture('complete');
+            this.complete = true;
         }
         return moving;
     }
@@ -130,14 +132,16 @@ class mainScene extends Phaser.Scene {
             return;
         }
         
-        if (Phaser.Input.Keyboard.JustDown(this.left)) {
-            this.move_piece("left");
-        } else if (Phaser.Input.Keyboard.JustDown(this.right)) {
-            this.move_piece("right");
-        } else if (Phaser.Input.Keyboard.JustDown(this.up)) {
-            this.move_piece("up");
-        } else if (Phaser.Input.Keyboard.JustDown(this.down)) {
-            this.move_piece("down");;
+        if (!this.complete) {
+            if (Phaser.Input.Keyboard.JustDown(this.left)) {
+                this.move_piece("left");
+            } else if (Phaser.Input.Keyboard.JustDown(this.right)) {
+                this.move_piece("right");
+            } else if (Phaser.Input.Keyboard.JustDown(this.up)) {
+                this.move_piece("up");
+            } else if (Phaser.Input.Keyboard.JustDown(this.down)) {
+                this.move_piece("down");;
+            }
         }
     }
 }
