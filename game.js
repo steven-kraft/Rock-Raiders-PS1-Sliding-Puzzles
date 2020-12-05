@@ -14,6 +14,9 @@ class mainScene extends Phaser.Scene {
 
     preload() {
         this.load.image('background', 'assets/background.png');
+        this.load.image('message', 'assets/message.png');
+        this.load.image('shuffling', 'assets/shuffling.png');
+        this.load.image('complete', 'assets/complete.png');
         for (let i = 1; i < 10; i++) {
             this.load.spritesheet(`puzzle${i}`, `assets/puzzle${i}.png`, { frameWidth: 122, frameHeight: 122 });
         }
@@ -34,6 +37,7 @@ class mainScene extends Phaser.Scene {
         this.cur_pos = {x:(Math.floor(EMPTY[puzzle_id]/3)), y:(EMPTY[puzzle_id]%3)}
 
         this.add.image(320, 240, 'background');
+        
         this.pieces = []
         
         for (let i = 0; i < 3; i++) {
@@ -43,6 +47,8 @@ class mainScene extends Phaser.Scene {
             }
             this.pieces.push(row);
         }
+        this.message = this.add.image(105, 434, 'message').setOrigin(0);
+        this.message.setTexture('message');
     }
 
     staging() {
@@ -63,8 +69,9 @@ class mainScene extends Phaser.Scene {
             }
         }
         this.staging_step += 1;
-        if (this.staging_step >= 200) {
+        if (this.staging_step >= 150) {
             this.sound.play('slide');
+            this.message.setTexture('message');
         }
         
     }
@@ -98,7 +105,9 @@ class mainScene extends Phaser.Scene {
             this.cur_pos.y = new_pos.y;
             if(sound) {this.sound.play('slide');}
         }
-        this.is_complete();
+        if(this.is_complete()) {
+            this.message.setTexture('complete');
+        }
         return moving;
     }
 
@@ -117,6 +126,7 @@ class mainScene extends Phaser.Scene {
             this.scene.restart();
         }
         if (this.staging_step < 150) {
+            this.message.setTexture('shuffling');
             this.staging();
             return;
         }
